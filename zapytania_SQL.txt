@@ -1,0 +1,65 @@
+--ZAPYTANIE 1 Podaj imię i nazwisko tych uchodźców, którzy zapłacą czynsz (czynsz nie równy 0)
+SELECT Uchodzca.Imie, Uchodzca.Nazwisko
+FROM Uchodzca INNER JOIN Adres_polska
+ON Uchodzca.Adres_polska_ID = Adres_polska.ID
+WHERE Adres_polska.Czynsz_miesieczny > 0;
+
+--ZAPYTANIE 2 Wybierz te adresy, które są w Polsce
+SELECT *
+FROM Adres, Panstwo
+WHERE Adres.ID = Panstwo.ID AND Panstwo.Nazwa LIKE 'Polska';
+
+--ZAPYTANIE 3 Podaj imię i nazwisko tych uchodźców, którzy współdzielą lokal w Polsce (Adres_polska) z właścicielem
+SELECT Uchodzca.Imie, Uchodzca.Nazwisko
+FROM Uchodzca, Adres_polska
+WHERE Uchodzca.Adres_polska_ID = Adres_polska.ID AND Adres_polska.Wspoldzielenie_z_wlascicielem LIKE '%tak%';
+
+--ZAPYTANIE 4 Podaj średnie opłaty za media, płacone przec uchodźców będących kobietami
+SELECT AVG(Oplaty_za_media)
+FROM Uchodzca, Adres_polska
+WHERE Uchodzca.Adres_polska_ID = Adres_polska.ID AND Uchodzca.Plec LIKE 'kobieta';
+
+--ZAPYTANIE 5 Podaj imię i nazwisko uchodźcy/uchodźców, którzy płaca najwyższy czynsz, jeśli czynsz ten wynosi więcej niż 1000 zł i posortuj wynik alfabetycznie po imieniu i nazwisku
+SELECT Uchodzca.Imie, Uchodzca.Nazwisko, MAX(Adres_polska.Czynsz_Miesieczny)
+FROM Uchodzca, Adres_polska
+WHERE Uchodzca.Adres_polska_ID = Adres_polska.ID 
+GROUP BY Uchodzca.Imie, Uchodzca.Nazwisko
+HAVING MAX(Adres_polska.Czynsz_Miesieczny) > 1000;
+
+--ZAPYTANIE 6 Podaj sumę, którą płacą za media uchodźcy będący mężczyznami, jeśli suma ta wynosi więcej niż 250 zł
+SELECT SUM(Oplaty_za_media)
+FROM Uchodzca, Adres_polska
+WHERE Uchodzca.Adres_polska_ID = Adres_polska.ID AND Uchodzca.Plec LIKE 'mezczyzna'
+HAVING SUM(Oplaty_za_media) > 250;
+
+--ZAPYTANIE 7 Znajdź uchodźcę z najwyższym czynszem
+SELECT *
+FROM Uchodzca INNER JOIN Adres_polska
+ON Uchodzca.Adres_polska_ID = Adres_polska.ID
+WHERE Czynsz_miesieczny = (SELECT MAX(Czynsz_miesieczny) FROM Adres_polska);
+
+--ZAPYTANIE 8 Znajdź ID adresów z Polski z opłatami za media większymi niż średnia za te opłaty
+SELECT Adres_polska.ID
+FROM Adres_polska
+GROUP BY Adres_polska.ID
+WHERE Oplaty_za_media > (SELECT AVG(Oplaty_za_media) FROM Adres_polska)
+
+--ZAPYTANIE 9 Znajdź ID, liczbę izb oraz czynsz miesięczny adresów w Polsce, których czynsz miesięczny jest większy niż 
+--średnia i są to adresy z taką samą liczbą izb. Posortuj wynik według malejacego czynszu
+SELECT ID, Liczba_izb, Czynsz_miesieczny
+FROM Adres_polska
+WHERE Czynsz_miesieczny > 
+(SELECT AVG(Czynsz_miesieczny) 
+FROM Adres_polska AS AP
+WHERE Adres_polska.Liczba_izb = AP.Liczba_izb)
+ORDER BY Czynsz_miesieczny ASC;
+
+--ZAPYTANIE 10 Znajdź ID tych adresów w Polsce, których maksymalna liczba izb jest większa niż średnia liczba izb 
+--dla adresów z tymi samymi czynszami
+SELECT ID
+FROM Adres_polska
+GROUP BY ID
+HAVING MAX(Liczba_izb) >= ANY
+(SELECT AVG(Liczba_izb)
+FROM Adres_polska AP
+Adres_polska.Czynsz_miesieczny = AP.Czynsz_miesieczny)

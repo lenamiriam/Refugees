@@ -1,0 +1,206 @@
+-- Created by Vertabelo (http://vertabelo.com)
+-- Last modification date: 2022-04-13 09:28:43.515
+
+-- tables
+-- Table: Adres
+CREATE TABLE Adres (
+    ID integer  NOT NULL,
+    Ulica varchar2(50)  NOT NULL,
+    Nr_budynku integer  NOT NULL,
+    Nr_lokalu integer  NULL,
+    Kod_pocztowy varchar2(6)  NOT NULL,
+    Miasto varchar2(50)  NOT NULL,
+    Panstwo_ID integer  NOT NULL,
+    CONSTRAINT Adres_pk PRIMARY KEY (ID)
+) ;
+
+-- Table: Adres_polska
+CREATE TABLE Adres_polska (
+    ID integer  NOT NULL,
+    Data_od date  NOT NULL,
+    Data_do date  NULL,
+    Czynsz_miesieczny integer  NOT NULL,
+    Oplaty_za_media integer  NOT NULL,
+    Liczba_izb integer  NOT NULL,
+    Media varchar2(100)  NOT NULL,
+    Metraz integer  NOT NULL,
+    Wspoldzielenie_z_wlascicielem varchar2(50)  NULL,
+    Wlasciciel_ID integer  NOT NULL,
+    Adres_ID integer  NOT NULL,
+    CONSTRAINT Adres_polska_pk PRIMARY KEY (ID)
+) ;
+
+-- Table: Dane_medyczne
+CREATE TABLE Dane_medyczne (
+    ID integer  NOT NULL,
+    Choroby_przewlekle varchar2(500)  NULL,
+    Leki varchar2(500)  NULL,
+    CONSTRAINT Dane_medyczne_pk PRIMARY KEY (ID)
+) ;
+
+-- Table: Kwalifikacje
+CREATE TABLE Kwalifikacje (
+    ID integer  NOT NULL,
+    Jezyki varchar2(100)  NOT NULL,
+    Prawo_jazdy varchar2(50)  NULL,
+    Umiejetnosci varchar2(500)  NOT NULL,
+    Poziom_wyksztalcenia varchar2(100)  NOT NULL,
+    Zawod_wykonywany_w_ukrainie varchar2(100)  NOT NULL,
+    CONSTRAINT Kwalifikacje_pk PRIMARY KEY (ID)
+) ;
+
+-- Table: Obecne_stanowisko
+CREATE TABLE Obecne_stanowisko (
+    ID integer  NOT NULL,
+    Nazwa varchar2(50)  NOT NULL,
+    Dzial varchar2(50)  NOT NULL,
+    Instytucja varchar2(100)  NOT NULL,
+    Telefon varchar2(13)  NOT NULL,
+    Adres_ID integer  NOT NULL,
+    Uchodzca_ID integer  NOT NULL,
+    CONSTRAINT Obecne_stanowisko_pk PRIMARY KEY (ID)
+) ;
+
+-- Table: Panstwo
+CREATE TABLE Panstwo (
+    ID integer  NOT NULL,
+    Nazwa varchar2(50)  NOT NULL,
+    CONSTRAINT Panstwo_pk PRIMARY KEY (ID)
+) ;
+
+-- Table: Uchodzca
+CREATE TABLE Uchodzca (
+    ID integer  NOT NULL,
+    Imie varchar2(50)  NOT NULL,
+    Nazwisko varchar2(100)  NOT NULL,
+    Plec varchar2(10)  NOT NULL,
+    Telefon varchar2(13)  NOT NULL,
+    Data_urodzenia date  NOT NULL,
+    Paszport varchar2(9)  NULL,
+    Inny_dokument_tosamosci varchar2(50)  NULL,
+    Pesel varchar2(11)  NULL,
+    Adres_polska_ID integer  NULL,
+    Kwalifikacje_ID integer  NOT NULL,
+    Dane_medyczne_ID integer  NOT NULL,
+    Adres_ID integer  NOT NULL,
+    CONSTRAINT Uchodzca_pk PRIMARY KEY (ID)
+) ;
+
+-- Table: Wlasciciel
+CREATE TABLE Wlasciciel (
+    ID integer  NOT NULL,
+    Imie varchar2(50)  NOT NULL,
+    Nazwisko varchar2(100)  NOT NULL,
+    Telefon varchar2(13)  NOT NULL,
+    Adres_wlasiciela_ID integer  NOT NULL,
+    CONSTRAINT Wlasciciel_pk PRIMARY KEY (ID)
+) ;
+
+-- foreign keys
+-- Reference: Adres_Panstwo (table: Adres)
+ALTER TABLE Adres ADD CONSTRAINT Adres_Panstwo
+    FOREIGN KEY (Panstwo_ID)
+    REFERENCES Panstwo (ID);
+
+-- Reference: Adres_polska_Adres (table: Adres_polska)
+ALTER TABLE Adres_polska ADD CONSTRAINT Adres_polska_Adres
+    FOREIGN KEY (Adres_ID)
+    REFERENCES Adres (ID);
+
+-- Reference: Adres_polska_Wlasciciel (table: Adres_polska)
+ALTER TABLE Adres_polska ADD CONSTRAINT Adres_polska_Wlasciciel
+    FOREIGN KEY (Wlasciciel_ID)
+    REFERENCES Wlasciciel (ID);
+
+-- Reference: Obecne_stanowisko_Adres (table: Obecne_stanowisko)
+ALTER TABLE Obecne_stanowisko ADD CONSTRAINT Obecne_stanowisko_Adres
+    FOREIGN KEY (Adres_ID)
+    REFERENCES Adres (ID);
+
+-- Reference: Obecne_stanowisko_Uchodzca (table: Obecne_stanowisko)
+ALTER TABLE Obecne_stanowisko ADD CONSTRAINT Obecne_stanowisko_Uchodzca
+    FOREIGN KEY (Uchodzca_ID)
+    REFERENCES Uchodzca (ID);
+
+-- Reference: Uchodzca_Adres (table: Uchodzca)
+ALTER TABLE Uchodzca ADD CONSTRAINT Uchodzca_Adres
+    FOREIGN KEY (Adres_ID)
+    REFERENCES Adres (ID);
+
+-- Reference: Uchodzca_Adres_polska (table: Uchodzca)
+ALTER TABLE Uchodzca ADD CONSTRAINT Uchodzca_Adres_polska
+    FOREIGN KEY (Adres_polska_ID)
+    REFERENCES Adres_polska (ID);
+
+-- Reference: Uchodzca_Dane_medyczne (table: Uchodzca)
+ALTER TABLE Uchodzca ADD CONSTRAINT Uchodzca_Dane_medyczne
+    FOREIGN KEY (Dane_medyczne_ID)
+    REFERENCES Dane_medyczne (ID);
+
+-- Reference: Uchodzca_Kwalifikacje (table: Uchodzca)
+ALTER TABLE Uchodzca ADD CONSTRAINT Uchodzca_Kwalifikacje
+    FOREIGN KEY (Kwalifikacje_ID)
+    REFERENCES Kwalifikacje (ID);
+
+-- Reference: Wlasciciel_Adres_wlasiciela (table: Wlasciciel)
+ALTER TABLE Wlasciciel ADD CONSTRAINT Wlasciciel_Adres_wlasiciela
+    FOREIGN KEY (Adres_wlasiciela_ID)
+    REFERENCES Adres (ID);
+
+--inserting data
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (1, 'Flory', 47 , 1, '02-009', 'Warszawa', 1);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (2, 'Złota', 3, 2, '03-008', 'Warszawa', 1);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (3, 'Jerozolimskie', 32, 22, '02-091', 'Warszawa', 1);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (4, 'Barnima', 122, NULL, '22-227', 'Szczecin', 1);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (5, 'Dominikańska', 1, 7, '42-987', 'Gdańsk', 1);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (6, 'Molonchna', 1, NULL, '71-765', 'Charków', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (7, 'Netechenska', 34, 56, '42-990', 'Kijów', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (8, 'Zalyvna', 44, 7, '44-876', 'Charków', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (9, 'Baturynska', 22, 3, '54-245', 'Odessa', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (10, 'Valerianivska', 33, NULL, '16-887', 'Lwów', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (11, 'Nadpilna', 12, 8, '55-876', 'Charków', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (12, 'Blahovisna', 77, 66, '32-756', 'Kijów', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (13, 'Shevchenka', 123, NULL, '14-567', 'Charków', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (14, 'Smilyanska', 31, 6, '98-465', 'Lwów', 2);
+INSERT INTO Adres(ID, Ulica, Nr_budynku, Nr_lokalu, Kod_pocztowy, Miasto, Panstwo_ID) VALUES (15, 'Pasterivska', 98, NULL, '234-456', 'Lwów', 2);
+
+INSERT INTO Adres_polska(ID, Data_od, Data_do, Czynsz_miesieczny, Oplaty_za_media, Liczba_izb, Media, Metraz, Wspoldzielenie_z_wlascicielem, Wlasciciel_ID, Adres_ID) VALUES (1, to_date('2022-03-01','yyyy-mm-dd'), to_date('2022-06-01','yyyy-mm-dd'), 0, 250, 1, 'energia elektryczna, woda, ogrzewanie, gaz, internet', 35, 'nie', 1, 1);
+INSERT INTO Adres_polska(ID, Data_od, Data_do, Czynsz_miesieczny, Oplaty_za_media, Liczba_izb, Media, Metraz, Wspoldzielenie_z_wlascicielem, Wlasciciel_ID, Adres_ID) VALUES (2, to_date('2022-03-22','yyyy-mm-dd'), to_date('2022-06-22','yyyy-mm-dd'), 0, 500, 4, 'energia elektryczna, woda, ogrzewanie, gaz, telewizja', 'tak, stale', 87, 2, 2);
+INSERT INTO Adres_polska(ID, Data_od, Data_do, Czynsz_miesieczny, Oplaty_za_media, Liczba_izb, Media, Metraz, Wspoldzielenie_z_wlascicielem, Wlasciciel_ID, Adres_ID) VALUES (3, to_date('2022-03-25','yyyy-mm-dd'), to_date('2023-03-25','yyyy-mm-dd'), 1000, 200, 4, 'energia elektryczna, woda, ogrzewanie, gaz', 120, 'nie', 3, 3);
+INSERT INTO Adres_polska(ID, Data_od, Data_do, Czynsz_miesieczny, Oplaty_za_media, Liczba_izb, Media, Metraz, Wspoldzielenie_z_wlascicielem, Wlasciciel_ID, Adres_ID) VALUES (4, to_date('2022-04-06','yyyy-mm-dd'), to_date('2022-07-01','yyyy-mm-dd'), 1500, 500, 2, 'energia elektryczna, woda, ogrzewanie, gaz', 44, 'tak, w weekendy', 4, 4);
+INSERT INTO Adres_polska(ID, Data_od, Data_do, Czynsz_miesieczny, Oplaty_za_media, Liczba_izb, Media, Metraz, Wspoldzielenie_z_wlascicielem, Wlasciciel_ID, Adres_ID) VALUES (5, to_date('2022-04-12','yyyy-mm-dd'), to_date('2022-08-27','yyyy-mm-dd'), 0, 100, 3, 'energia elektryczna, woda, ogrzewanie, gaz', 39, 'tak, stale', 5, 5);
+
+INSERT INTO Dane_medyczne(ID, Choroby_przewlekle, Leki) VALUES (1, 'padaczka', 'Vetira');
+INSERT INTO Dane_medyczne(ID, Choroby_przewlekle, Leki) VALUES (2, NULL, NULL);
+INSERT INTO Dane_medyczne(ID, Choroby_przewlekle, Leki) VALUES (3, NULL, NULL);
+INSERT INTO Dane_medyczne(ID, Choroby_przewlekle, Leki) VALUES (4, NULL, NULL);
+INSERT INTO Dane_medyczne(ID, Choroby_przewlekle, Leki) VALUES (5, 'cukrzyca, osteoporoza', 'Diaprin, Calperos duo');
+
+INSERT INTO Kwalifikacje (ID, Jezyki, Prawo_jazdy, Umiejetnosci, Poziom_wyksztalcenia, Zawod_wykonywany_w_ukrainie) VALUES (1, 'ukraiński', 'tak, kategoria B', 'umiejętności analityczne, zarządzania budżetem, świadomość komercyjna, wiedza z zakresu zarządzania finansami i prawa podatkowego', 'wyższe', 'analityczka finansowa');
+INSERT INTO Kwalifikacje (ID, Jezyki, Prawo_jazdy, Umiejetnosci, Poziom_wyksztalcenia, Zawod_wykonywany_w_ukrainie) VALUES (2, 'ukraiński', 'nie', 'umiejętność nawiązywania kontaktu z innymi, praca zespołowa, umiejętności negocjacyjne i rozwiązywanie konfliktów, wywierania wpływu, zachowania asertywne, empatia, cierpliwość, wyrozumiałość', 'wyższe', 'nauczyciel ukraińskiego');
+INSERT INTO Kwalifikacje (ID, Jezyki, Prawo_jazdy, Umiejetnosci, Poziom_wyksztalcenia, Zawod_wykonywany_w_ukrainie) VALUES (3, 'ukraiński, angielski', 'tak, kategoria B i C', 'masaż tajski, co-managerka salonu', 'podstawowe', 'masażysztka');
+INSERT INTO Kwalifikacje (ID, Jezyki, Prawo_jazdy, Umiejetnosci, Poziom_wyksztalcenia, Zawod_wykonywany_w_ukrainie) VALUES (4, 'rosyjski, angielski, polski', 'tak, kategoria B', 'backend: Java, Python, SQL', 'wyższe', 'programista');
+INSERT INTO Kwalifikacje (ID, Jezyki, Prawo_jazdy, Umiejetnosci, Poziom_wyksztalcenia, Zawod_wykonywany_w_ukrainie) VALUES (5, 'rosyjski, angielski', 'tak, kategoria B', 'znajomość statystyki i analizy danych, Python, PySpark, SQL i NoSQL', 'wyższe', 'data scientist');
+
+INSERT INTO Obecne_stanowisko(ID, Nazwa, Dzial, Instytucja, Telefon, Adres_ID, Uchodzca_ID) VALUES (1, 'manager ds. analiz finansowych ', 'finansowy', 'BG Capital', '+380873425174', 11, 1);
+INSERT INTO Obecne_stanowisko(ID, Nazwa, Dzial, Instytucja, Telefon, Adres_ID, Uchodzca_ID) VALUES (2, 'nauczyciel ukraińskiego', 'nauczyciele ukraińskiego', 'Kyiv Secondary School No. 189 ', '+380777654387', 12, 2);
+INSERT INTO Obecne_stanowisko(ID, Nazwa, Dzial, Instytucja, Telefon, Adres_ID, Uchodzca_ID) VALUES (3, 'masażystka', 'masaże', 'Rachel', '+380987321221', 13, 3);
+INSERT INTO Obecne_stanowisko(ID, Nazwa, Dzial, Instytucja, Telefon, Adres_ID, Uchodzca_ID) VALUES (4, 'senior programista backend', 'IT', 'PrivatBank', +380987453222', 14, 4);
+INSERT INTO Obecne_stanowisko(ID, Nazwa, Dzial, Instytucja, Telefon, Adres_ID, Uchodzca_ID) VALUES (5, 'data scientist, 'IT', 'Kyivstar', '+380444536765', 15, 5);
+
+INSERT INTO Panstwo (ID, Nazwa) VALUES (1, 'Polska');
+INSERT INTO Panstwo (ID, Nazwa) VALUES (2, 'Ukraina');
+
+INSERT INTO Uchodzca (ID, Imie, Nazwisko, Plec, Telefon, Data_urodzenia, Parszport, Inny_dokument_tosamosci, Pesel, Adres_polska_ID, Kwalifikacje_ID, Dane_Medyczne_ID, Adres_ID) VALUES (1, 'Yulia', 'Szewczenko', 'kobieta', '+380333452765', to_date('1989-03-14','yyyy-mm-dd'), NULL, 'tak, dowód osobisty', '10245573429', 1, 1, 1, 6);
+INSERT INTO Uchodzca (ID, Imie, Nazwisko, Plec, Telefon, Data_urodzenia, Parszport, Inny_dokument_tosamosci, Pesel, Adres_polska_ID, Kwalifikacje_ID, Dane_Medyczne_ID, Adres_ID) VALUES (2, 'Ivan', 'Melnyk', 'mężczyzna', '+380999875342', to_date('1950-12-09','yyyy-mm-dd'), 'tak', 'tak, dowód osobisty', '87654223412', 2, 2, 2, 7);
+INSERT INTO Uchodzca (ID, Imie, Nazwisko, Plec, Telefon, Data_urodzenia, Parszport, Inny_dokument_tosamosci, Pesel, Adres_polska_ID, Kwalifikacje_ID, Dane_Medyczne_ID, Adres_ID) VALUES (3, 'Kalyna', 'Rymar', 'kobieta', '+3802317648772', to_date('2000-02-02','yyyy-mm-dd'), 'tak', 'tak, dowód osobisty', '33352710089', 3, 3, 3, 8);
+INSERT INTO Uchodzca (ID, Imie, Nazwisko, Plec, Telefon, Data_urodzenia, Parszport, Inny_dokument_tosamosci, Pesel, Adres_polska_ID, Kwalifikacje_ID, Dane_Medyczne_ID, Adres_ID) VALUES (4, 'Tymofi', 'Sasko', 'mężczyzna', '+380228645342', to_date('1987-10-24','yyyy-mm-dd'), 'tak', 'tak, dowód osobisty', '65342187649', 4, 4, 4, 9);
+INSERT INTO Uchodzca (ID, Imie, Nazwisko, Plec, Telefon, Data_urodzenia, Parszport, Inny_dokument_tosamosci, Pesel, Adres_polska_ID, Kwalifikacje_ID, Dane_Medyczne_ID, Adres_ID) VALUES (5, 'Ganna', 'Bojko', 'kobieta', '+380998537625', to_date('1995-05-17','yyyy-mm-dd'), 'tak', 'tak, dowód osobisty', '77765432987', 5, 5, 5, 10);
+
+INSERT INTO Wlasciciel (ID, Imie, Nazwisko, Telefon, Adres_wlasciciela_ID) VALUES (1, 'Anna', 'Sawicka', '+48500478765', 1);
+INSERT INTO Wlasciciel (ID, Imie, Nazwisko, Telefon, Adres_wlasciciela_ID) VALUES (2, 'Michał', 'Miller', '+48555432765', 2);
+INSERT INTO Wlasciciel (ID, Imie, Nazwisko, Telefon, Adres_wlasciciela_ID) VALUES (3, 'Anastazja', 'Marchlewska', '+48987666543', 3);
+INSERT INTO Wlasciciel (ID, Imie, Nazwisko, Telefon, Adres_wlasciciela_ID) VALUES (4, 'Dominik', 'Snieżyński', '+48232444543', 4);
+INSERT INTO Wlasciciel (ID, Imie, Nazwisko, Telefon, Adres_wlasciciela_ID) VALUES (5, 'Samanta', 'Ochalska', '+48999876567', 5); 
+-- End of file.
+
